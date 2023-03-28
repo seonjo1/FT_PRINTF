@@ -6,13 +6,13 @@
 /*   By: seonjo <seonjo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 14:54:37 by seonjo            #+#    #+#             */
-/*   Updated: 2023/03/23 17:15:53 by seonjo           ###   ########.fr       */
+/*   Updated: 2023/03/28 22:22:17 by seonjo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int	putstr(char *s)
+static int	putstr(char *s)
 {
 	int	i;
 
@@ -25,57 +25,62 @@ int	putstr(char *s)
 	return (i);
 }
 
-int	putchar(char c)
+static int	putchar(char c)
 {
 	write(1, &c, 1);
 	return (1);
 }
 
-int putptr(void *ptr)
+static int	ft_printf2(char c, va_list cp, size_t *all_len, int tmp)
 {
-	
-	
+	if (c == 'c')
+		*all_len = *all_len + putchar(va_arg(cp, int));
+	else if (c == 's')
+	{
+		tmp = putstr(va_arg(cp, char *));
+		*all_len = *all_len + tmp;
+		return (2);
+	}
+	else if (c == 'p')
+		*all_len = *all_len + putptr(va_arg(cp, void *));
+	else if (c == 'd' || c == 'i')
+		*all_len = *all_len + putnbr_d(va_arg(cp, int));
+	else if (c == 'u')
+		*all_len = *all_len + putnbr_u(va_arg(cp, unsigned int));
+	else if (c == 'x')
+		*all_len = *all_len + putnbr_16(va_arg(cp, unsigned int), 'x');
+	else if (c == 'X')
+		*all_len = *all_len + putnbr_16(va_arg(cp, unsigned int), 'X');
+	else if (c == '%')
+		*all_len = *all_len + putchar('%');
+	if (c == '%')
+		return (0);
+	else
+		return (1);
 }
 
 int	ft_printf(const char *last, ...)
 {
+	size_t	tmp;
 	size_t	i;
 	size_t	all_len;
 	va_list	ap;
-	int		tmp;
+	va_list	cp;
 
 	va_start(ap, last);
 	i = 0;
 	while (last[i] != '\0')
 	{
-		if (last[i] != '%')
-			all_len = all_len + putchar(&last[i]);
-		else
+		if (last[i] == '%')
 		{
 			i = i + 1;
-			if (last[i] == 'c')
-				all_len = all_len + putchar(va_arg(ap, char));
-			else if (last[i] == 's')
-			{
-				tmp = putstr(va_arg(ap, char));
-				all_len = all_len + tmp;
-				if (tmp != 0)
-					while (va_arg(ap, char) != '\0')
-						;
-			}
-			else if (last[i] == 'p') //포인터 
-				all_len = all_len + putptr(va_arg(ap, void *));
-			else if (last[i] == 'd' || last[i] == 'i') // 부호가 있는 십진 정수
-				all_len = all_len + putnbr_d(va_arg(ap, int), 1);
-			else if (last[i] == 'u') // unsigned int
-				all_len = all_len + putnbr_u(va_arg(ap, unsigned int), 1);
-			else if (last[i] == 'x') // abcdef를 사용한 부호가 없는 16진 정수
-				all_len = all_len + putnbr_16(va_arg(ap, unsigned int), 1, 'x');
-			else if (last[i] == 'X') // ABCDEF를 사용한 부호가 없는 16진 정수
-				all_len = all_len + putnbr_16(va_arg(ap, unsigned int), 1, 'X');
-			else if (last[i] == '%')
-				all_len = all_len + putchar('%');
+			va_copy(cp, ap);
+			tmp = ft_printf2(last[i], cp, &all_len, 0);
+			while (tmp--)
+				va_arg(ap, int);
 		}
+		else
+			all_len = all_len + putchar(last[i]);
 		i = i + 1;
 	}
 	va_end(ap);

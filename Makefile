@@ -3,7 +3,7 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror
 ARFLGS = ar rusc
 
-SRCS = 
+SRCS = ft_printf_number.c ft_printf.c ft_printf_pointer.c
 OBJS = $(SRCS:.c=.o)
 
 .PHONY : all clean fclean re
@@ -14,7 +14,7 @@ $(NAME) : $(OBJS)
 	$(ARFLGS) $(NAME) $(OBJS)
 
 %.o : %.c
-	$(CC) $(CFLAGS) -I . -c $<
+	$(CC) $(CFLAGS) -I. -c $<
 
 clean :
 	rm -f $(OBJS)

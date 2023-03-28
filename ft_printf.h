@@ -6,7 +6,7 @@
 /*   By: seonjo <seonjo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 16:43:44 by seonjo            #+#    #+#             */
-/*   Updated: 2023/03/23 16:48:24 by seonjo           ###   ########.fr       */
+/*   Updated: 2023/03/28 22:23:07 by seonjo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,10 @@
 # include <stdlib.h>
 # include <unistd.h>
 
-int	putnbr_d(int n, int fd);
-int	putnbr_u(unsigned int n, int fd);
-int	putnbr_16(unsigned int num, int fd, char opt);
+int	putnbr_d(int n);
+int	putnbr_u(unsigned int n);
+int	putnbr_16(unsigned int num, char opt);
+int	ft_printf(const char *last, ...);
+int	putptr(void *ptr);
 
 #endif
