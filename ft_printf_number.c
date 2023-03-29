@@ -6,27 +6,28 @@
 /*   By: seonjo <seonjo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 16:42:39 by seonjo            #+#    #+#             */
-/*   Updated: 2023/03/28 22:23:34 by seonjo           ###   ########.fr       */
+/*   Updated: 2023/03/29 21:30:56 by seonjo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-static int	print_num(long long num, int count)
+static int	ft_print_num(long long num, int count, int *all_len)
 {
 	char	c;
 
 	if (num != 0)
 	{
-		count = print_num(num / 10, count);
+		count = ft_print_num(num / 10, count, all_len);
 		c = num % 10 + '0';
-		write(1, &c, 1);
+		if (write(1, &c, 1) == -1)
+			*all_len = *all_len + INT_MIN;
 		count = count + 1;
 	}
 	return (count);
 }
 
-int	putnbr_d(int n)
+void	ft_putnbr_d(int n, int *all_len)
 {
 	long long	num;
 	int			minus;
@@ -37,23 +38,25 @@ int	putnbr_d(int n)
 	count = 0;
 	if (num == 0)
 	{
-		write(1, "0", 1);
-		return (1);
+		if (write(1, "0", 1) == -1)
+			*all_len = *all_len + INT_MIN;
+		*all_len = *all_len + 1;
 	}
 	else
 	{
 		if (num < 0)
 		{
-			write(1, "-", 1);
+			if (write(1, "-", 1) == -1)
+				*all_len = *all_len + INT_MIN;
 			count = count + 1;
 			num = -num;
 		}
-		count = print_num(num, count);
+		count = ft_print_num(num, count, all_len);
+		*all_len = *all_len + count;
 	}
-	return (count);
 }
 
-int	putnbr_u(unsigned int n)
+void	ft_putnbr_u(unsigned int n, int *all_len)
 {
 	long long	num;
 	int			minus;
@@ -64,31 +67,33 @@ int	putnbr_u(unsigned int n)
 	count = 0;
 	if (num == 0)
 	{
-		write(1, "0", 1);
-		return (1);
+		if (write(1, "0", 1) == -1)
+			*all_len = *all_len + INT_MIN;
+		*all_len = *all_len + 1;
 	}
 	else
 	{
-		count = print_num(num, count);
+		count = ft_print_num(num, count, all_len);
+		*all_len = *all_len + count;
 	}
-	return (count);
 }
 
-static int	print_num_16(unsigned int num, int count, char *base)
+static int	ft_print_16(unsigned int num, int count, char *base, int *all_len)
 {
 	char	c;
 
 	if (num != 0)
 	{
-		count = print_num_16(num / 16, count, base);
+		count = ft_print_16(num / 16, count, base, all_len);
 		c = base[num % 16];
-		write(1, &c, 1);
+		if (write(1, &c, 1) == -1)
+			*all_len = *all_len + INT_MIN;
 		count = count + 1;
 	}
 	return (count);
 }
 
-int	putnbr_16(unsigned int num, char opt)
+void	ft_putnbr_16(unsigned int num, char opt, int *all_len)
 {
 	int		minus;
 	int		count;
@@ -98,8 +103,9 @@ int	putnbr_16(unsigned int num, char opt)
 	count = 0;
 	if (num == 0)
 	{
-		write(1, "0", 1);
-		return (1);
+		if (write(1, "0", 1) == -1)
+			*all_len = *all_len + INT_MIN;
+		*all_len = *all_len + 1;
 	}
 	else
 	{
@@ -107,7 +113,7 @@ int	putnbr_16(unsigned int num, char opt)
 			base = "0123456789ABCDEF";
 		else
 			base = "0123456789abcdef";
-		count = print_num_16(num, count, base);
+		count = ft_print_16(num, count, base, all_len);
+		*all_len = *all_len + count;
 	}
-	return (count);
 }
