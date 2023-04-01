@@ -6,21 +6,13 @@
 /*   By: seonjo <seonjo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 14:54:37 by seonjo            #+#    #+#             */
-/*   Updated: 2023/03/29 21:46:31 by seonjo           ###   ########.fr       */
+/*   Updated: 2023/04/01 17:48:16 by seonjo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-static int	error_check(int all_len)
-{
-	if (all_len >= 0)
-		return (all_len);
-	else
-		return (-1);
-}
-
-static void	ft_putstr(char *s, int *all_len)
+static int	ft_putstr(char *s, int *all_len)
 {
 	int	i;
 
@@ -28,7 +20,7 @@ static void	ft_putstr(char *s, int *all_len)
 	if (s == NULL)
 	{
 		if (write(1, "(null)", 6) == -1)
-			*all_len = INT_MIN;
+			return (-1);
 		*all_len = *all_len + 6;
 	}
 	else
@@ -36,53 +28,54 @@ static void	ft_putstr(char *s, int *all_len)
 		while (s[i] != '\0')
 		{
 			if (write(1, &s[i], 1) == -1)
-				*all_len = INT_MIN;
+				return (-1);
 			i = i + 1;
 		}
 		*all_len = *all_len + i;
 	}
+	return (0);
 }
 
-static void	ft_putchar(char c, int *all_len)
+static int	ft_putchar(char c, int *all_len)
 {
 	if (write(1, &c, 1) == -1)
-		*all_len = INT_MIN;
+		return (-1);
 	*all_len = *all_len + 1;
+	return (0);
 }
 
-static int	ft_printf2(char c, va_list cp, int *all_len)
+static int	ft_printf2(char c, va_list *ap, int *all_len)
 {
+	int	error_flag;
+
+	error_flag = 0;
 	if (c == 'c')
-		ft_putchar((char)va_arg(cp, int), all_len);
+		error_flag = ft_putchar((char)va_arg(*ap, int), all_len);
 	else if (c == 's')
-		ft_putstr(va_arg(cp, char *), all_len);
+		error_flag = ft_putstr(va_arg(*ap, char *), all_len);
 	else if (c == 'p')
-		ft_putptr(va_arg(cp, void *), all_len);
+		error_flag = ft_putptr(va_arg(*ap, void *), all_len);
 	else if (c == 'd' || c == 'i')
-		ft_putnbr_d(va_arg(cp, int), all_len);
+		error_flag = ft_putnbr_d(va_arg(*ap, int), all_len);
 	else if (c == 'u')
-		ft_putnbr_u(va_arg(cp, unsigned int), all_len);
+		error_flag = ft_putnbr_u(va_arg(*ap, unsigned int), all_len);
 	else if (c == 'x')
-		ft_putnbr_16(va_arg(cp, unsigned int), 'x', all_len);
+		error_flag = ft_putnbr_16(va_arg(*ap, unsigned int), 'x', all_len);
 	else if (c == 'X')
-		ft_putnbr_16(va_arg(cp, unsigned int), 'X', all_len);
+		error_flag = ft_putnbr_16(va_arg(*ap, unsigned int), 'X', all_len);
 	else if (c == '%')
-		ft_putchar('%', all_len);
-	if (c == 'p' || c == 's')
-		return (2);
-	else if (c == '%')
-		return (0);
+		error_flag = ft_putchar('%', all_len);
+	if (error_flag == -1)
+		return (-1);
 	else
-		return (1);
+		return (0);
 }
 
 int	ft_printf(const char *last, ...)
 {
 	va_list	ap;
-	va_list	cp;
 	int		all_len;
 	size_t	i;
-	size_t	tmp;
 
 	va_start(ap, last);
 	all_len = 0;
@@ -91,16 +84,12 @@ int	ft_printf(const char *last, ...)
 	{
 		if (last[i++] == '%')
 		{
-			va_copy(cp, ap);
-			tmp = ft_printf2(last[i++], cp, &all_len);
-			if (tmp == 1)
-				va_arg(ap, int);
-			else if (tmp == 2)
-				va_arg(ap, char *);
+			if (ft_printf2(last[i++], &ap, &all_len) == -1)
+				return (-1);
 		}
-		else
-			ft_putchar(last[i - 1], &all_len);
+		else if (ft_putchar(last[i - 1], &all_len) == -1)
+			return (-1);
 	}
 	va_end(ap);
-	return (error_check(all_len));
+	return (all_len);
 }
