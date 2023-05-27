@@ -6,19 +6,19 @@
 /*   By: seonjo <seonjo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 16:42:39 by seonjo            #+#    #+#             */
-/*   Updated: 2023/04/01 17:56:08 by seonjo           ###   ########.fr       */
+/*   Updated: 2023/05/27 15:33:20 by seonjo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-static int	ft_putnbr2(long long num, int count, int *all_len)
+static int	ft_putnbr2(long long num, int count)
 {
 	char	c;
 
 	if (num != 0)
 	{
-		count = ft_putnbr2(num / 10, count, all_len);
+		count = ft_putnbr2(num / 10, count);
 		if (count == -1)
 			return (-1);
 		c = num % 10 + '0';
@@ -51,7 +51,7 @@ int	ft_putnbr_d(int n, int *all_len)
 		count = count + 1;
 		num = -num;
 	}
-	count = ft_putnbr2(num, count, all_len);
+	count = ft_putnbr2(num, count);
 	if (count == -1)
 		return (-1);
 	*all_len = *all_len + count;
@@ -73,20 +73,20 @@ int	ft_putnbr_u(unsigned int n, int *all_len)
 			return (-1);
 		*all_len = *all_len + 1;
 	}
-	count = ft_putnbr2(num, count, all_len);
+	count = ft_putnbr2(num, count);
 	if (count == -1)
 		return (-1);
 	*all_len = *all_len + count;
 	return (0);
 }
 
-static int	ft_putnbr2_16(unsigned int num, int count, char *base, int *all_len)
+static int	ft_putnbr2_16(unsigned int num, int count, char *base)
 {
 	char	c;
 
 	if (num != 0)
 	{
-		count = ft_putnbr2_16(num / 16, count, base, all_len);
+		count = ft_putnbr2_16(num / 16, count, base);
 		if (count == -1)
 			return (-1);
 		c = base[num % 16];
@@ -115,7 +115,7 @@ int	ft_putnbr_16(unsigned int num, char opt, int *all_len)
 		base = "0123456789ABCDEF";
 	else
 		base = "0123456789abcdef";
-	count = ft_putnbr2_16(num, count, base, all_len);
+	count = ft_putnbr2_16(num, count, base);
 	if (count == -1)
 		return (-1);
 	*all_len = *all_len + count;

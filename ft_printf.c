@@ -6,7 +6,7 @@
 /*   By: seonjo <seonjo@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/23 14:54:37 by seonjo            #+#    #+#             */
-/*   Updated: 2023/04/01 17:48:16 by seonjo           ###   ########.fr       */
+/*   Updated: 2023/05/27 15:15:16 by seonjo           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ static int	ft_putstr(char *s, int *all_len)
 {
 	int	i;
 
-	i = 0;
 	if (s == NULL)
 	{
 		if (write(1, "(null)", 6) == -1)
@@ -25,6 +24,7 @@ static int	ft_putstr(char *s, int *all_len)
 	}
 	else
 	{
+		i = 0;
 		while (s[i] != '\0')
 		{
 			if (write(1, &s[i], 1) == -1)
@@ -48,7 +48,7 @@ static int	ft_printf2(char c, va_list *ap, int *all_len)
 {
 	int	error_flag;
 
-	error_flag = 0;
+	error_flag = -1;
 	if (c == 'c')
 		error_flag = ft_putchar((char)va_arg(*ap, int), all_len);
 	else if (c == 's')
@@ -74,8 +74,8 @@ static int	ft_printf2(char c, va_list *ap, int *all_len)
 int	ft_printf(const char *last, ...)
 {
 	va_list	ap;
-	int		all_len;
 	size_t	i;
+	int		all_len;
 
 	va_start(ap, last);
 	all_len = 0;
@@ -84,6 +84,8 @@ int	ft_printf(const char *last, ...)
 	{
 		if (last[i++] == '%')
 		{
+			if (last[i] == '\0')
+				return (-1);
 			if (ft_printf2(last[i++], &ap, &all_len) == -1)
 				return (-1);
 		}
